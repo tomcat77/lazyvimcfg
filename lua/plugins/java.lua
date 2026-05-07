@@ -1,11 +1,16 @@
--- Java LSP configuration with Lombok support
--- Дополнительная настройка nvim-jdtls после загрузки lazyvim.plugins.extras.lang.java
--- Импорт extras.lang.java находится в lua/config/lazy.lua
--- Фильтрация уведомлений настроена в lua/plugins/noice.lua
+-- Java LSP + DAP (Maven / Spring Boot)
+-- extras: dap.core + lang.java в lua/config/lazy.lua
+-- Фильтрация уведомлений: lua/plugins/noice.lua
+--
+-- Отладка Spring Boot через attach: поднимите приложение с JDWP, затем <leader>dc → выберите конфиг.
+-- Пример (Maven, порт 5005):
+--   ./mvnw spring-boot:run -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+-- Либо «Launch» из jdtls: <leader>dc → конфиги main-класса подставляются после LspAttach.
 
 return {
     {
         "mfussenegger/nvim-jdtls",
+        dependencies = { "mfussenegger/nvim-dap" },
         opts = function(_, opts)
             -- Получаем путь к Mason
             local mason_path = vim.fn.stdpath("data") .. "/mason"
@@ -32,6 +37,24 @@ return {
                 end
             end
 
+            return opts
+        end,
+    },
+    -- Доп. attach-порты после preset из lazyvim.plugins.extras.lang.java (порт 5005).
+    {
+        "mfussenegger/nvim-dap",
+        opts = function(_, opts)
+            local dap = require("dap")
+            dap.configurations.java = dap.configurations.java or {}
+            vim.list_extend(dap.configurations.java, {
+                {
+                    type = "java",
+                    request = "attach",
+                    name = "Java: attach localhost:8000",
+                    hostName = "127.0.0.1",
+                    port = 8000,
+                },
+            })
             return opts
         end,
     },
