@@ -6,6 +6,7 @@ return {
   opts = {
     formatters_by_ft = {
       java = { "google-java-format" },
+      sql = { "sqlfluff" },
     },
     formatters = {
       ["google-java-format"] = {
@@ -14,6 +15,11 @@ return {
           description = "Reformats Java source code according to Google's style (matches IntelliJ IDEA defaults).",
         },
         prepend_args = { "--aosp" },
+      },
+      sqlfluff = {
+        args = { "fix", "--dialect", "postgres", "--ignore", "parsing", "--FIX-EVEN-UNPARSABLE", "-" },
+        require_cwd = false,
+        exit_codes = { 0, 1 },
       },
     },
   },

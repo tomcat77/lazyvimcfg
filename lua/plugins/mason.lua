@@ -6,6 +6,7 @@ return {
             "google-java-format",
             "java-debug-adapter",
             "java-test",
+            "sqlfluff",
         },
     },
 }
